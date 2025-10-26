@@ -192,6 +192,50 @@
   }
 }
 
+.migration-section {
+  margin-top: 2rem;
+  
+  h3 {
+    color: #333;
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.migration-content {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  
+  p {
+    color: #666;
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+  }
+}
+
+.migration-button {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(255, 107, 53, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 0 0.5rem;

@@ -69,6 +69,19 @@
             </div>
           </div>
         </div>
+
+        <div class="migration-section">
+          <h3>Sample Data</h3>
+          <div class="migration-content">
+            <p>If your wishlists are empty, you can populate them with sample data to see how the app works.</p>
+            <button 
+              (click)="migrateSampleData()" 
+              class="migration-button"
+              [disabled]="isMigrating">
+              {{ isMigrating ? 'Migrating...' : 'Add Sample Data' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

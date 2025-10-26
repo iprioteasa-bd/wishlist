@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FirebaseWishlistService } from './firebase-wishlist.service';
+import { SAMPLE_WISHLIST_DATA } from '../data/sample-wishlist-data';
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +18,14 @@ export class FirebaseInitializationService {
       
       // Only initialize if both are null (meaning documents don't exist)
       if (!ioanaData && !iulianData) {
-        console.log('Initializing Firebase wishlist data...');
-        const success = await this.firebaseWishlistService.initializeWishlists().toPromise();
+        console.log('Initializing Firebase wishlist data with sample data...');
         
-        if (success) {
-          console.log('Firebase wishlist data initialized successfully!');
+        // Initialize with sample data instead of empty wishlists
+        const ioanaSuccess = await this.firebaseWishlistService.updateWishlist('ioana', SAMPLE_WISHLIST_DATA.ioana).toPromise();
+        const iulianSuccess = await this.firebaseWishlistService.updateWishlist('iulian', SAMPLE_WISHLIST_DATA.iulian).toPromise();
+        
+        if (Boolean(ioanaSuccess) && Boolean(iulianSuccess)) {
+          console.log('Firebase wishlist data initialized successfully with sample data!');
         } else {
           console.error('Failed to initialize Firebase wishlist data');
         }

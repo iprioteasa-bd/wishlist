@@ -248,27 +248,89 @@ export class FirebaseWishlistService {
     return this.iulianWishlistSubject.value;
   }
 
-  // Initialize empty wishlists for both users (useful for first-time setup)
-  initializeWishlists(): Observable<boolean> {
-    const ioanaWishlist: WishlistData = {
+  // Force migration of sample data (useful for existing empty wishlists)
+  migrateSampleData(): Observable<boolean> {
+    console.log('Starting sample data migration...');
+    
+    const ioanaPromise = this.updateWishlist('ioana', {
       user: 'Ioana',
       lastUpdated: new Date().toISOString().split('T')[0],
-      items: []
-    };
+      items: [
+        {
+          id: 1,
+          name: "Wireless Headphones",
+          link: "https://example.com/headphones",
+          priority: "high" as const
+        },
+        {
+          id: 2,
+          name: "Coffee Maker",
+          link: "https://example.com/coffee-maker",
+          priority: "medium" as const
+        },
+        {
+          id: 3,
+          name: "Yoga Mat",
+          link: "https://example.com/yoga-mat",
+          priority: "low" as const
+        },
+        {
+          id: 4,
+          name: "Books Collection",
+          link: "https://example.com/books",
+          priority: "medium" as const
+        }
+      ]
+    });
 
-    const iulianWishlist: WishlistData = {
+    const iulianPromise = this.updateWishlist('iulian', {
       user: 'Iulian',
       lastUpdated: new Date().toISOString().split('T')[0],
-      items: []
-    };
+      items: [
+        {
+          id: 1,
+          name: "Gaming Monitor",
+          link: "https://example.com/gaming-monitor",
+          priority: "high" as const
+        },
+        {
+          id: 2,
+          name: "Mechanical Keyboard",
+          link: "https://example.com/keyboard",
+          priority: "high" as const
+        },
+        {
+          id: 3,
+          name: "Gaming Chair",
+          link: "https://example.com/gaming-chair",
+          priority: "medium" as const
+        },
+        {
+          id: 4,
+          name: "Protein Powder",
+          link: "https://example.com/protein",
+          priority: "low" as const
+        },
+        {
+          id: 5,
+          name: "Smart Watch",
+          link: "https://example.com/smartwatch",
+          priority: "medium" as const
+        }
+      ]
+    });
 
     return from(Promise.all([
-      setDoc(doc(db, this.COLLECTION_NAME, 'ioana'), ioanaWishlist),
-      setDoc(doc(db, this.COLLECTION_NAME, 'iulian'), iulianWishlist)
+      ioanaPromise.toPromise(),
+      iulianPromise.toPromise()
     ])).pipe(
-      map(() => true),
+      map((results) => {
+        const [ioanaSuccess, iulianSuccess] = results;
+        console.log('Sample data migration completed:', { ioanaSuccess, iulianSuccess });
+        return Boolean(ioanaSuccess) && Boolean(iulianSuccess);
+      }),
       catchError(error => {
-        console.error('Error initializing wishlists:', error);
+        console.error('Error during sample data migration:', error);
         return from([false]);
       })
     );
