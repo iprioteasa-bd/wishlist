@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { WishlistData, WishlistItem } from '../models/wishlist.model';
-import { GitHubWishlistService } from '../services/github-wishlist.service';
+import { FirebaseWishlistService } from '../services/firebase-wishlist.service';
 
 @Component({
   selector: 'app-ioana-wishlist',
@@ -26,38 +25,32 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
   newItem: Partial<WishlistItem> = {
     name: '',
     link: '',
-    priority: 'medium'
+    priority: 'medium',
+    hasLink: false
   };
   
   constructor(
     private router: Router, 
-    private http: HttpClient,
-    private githubService: GitHubWishlistService
+    private firebaseService: FirebaseWishlistService
   ) {}
 
   ngOnInit() {
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates from Firebase
     this.subscription.add(
-      this.githubService.ioanaWishlist$.subscribe(data => {
+      this.firebaseService.ioanaWishlist$.subscribe(data => {
+        console.log('Ioana component received data:', data);
         if (data) {
           this.wishlistData = data;
           this.loading = false;
         }
       })
     );
-
-    // Load initial data
-    this.loadWishlistData();
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  loadWishlistData() {
-    this.loading = true;
-    this.githubService.loadIoanaWishlist();
-  }
 
   startEdit(item: WishlistItem) {
     this.editingItem = { ...item };
@@ -72,44 +65,37 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
 
   saveEdit() {
     if (this.editingItem && this.wishlistData) {
-      const index = this.wishlistData.items.findIndex(item => item.id === this.editingItem!.id);
-      if (index !== -1) {
-        this.wishlistData.items[index] = { ...this.editingItem };
-        this.wishlistData.lastUpdated = new Date().toLocaleDateString('en-GB');
-        
-        // Update via GitHub API for real-time sync
-        this.githubService.updateWishlist('ioana', this.wishlistData)
-          .subscribe({
-            next: () => {
-              console.log('Wishlist updated on GitHub');
+      // Update the item using Firebase service
+      this.firebaseService.updateWishlistItem('ioana', this.editingItem.id, this.editingItem)
+        .subscribe({
+          next: (success) => {
+            if (success) {
+              console.log('Wishlist item updated in Firebase');
               this.editingItem = null;
-            },
-            error: (error) => {
-              console.error('Error updating wishlist:', error);
-              // Fallback to localStorage
-              this.saveToLocalStorage();
-              this.editingItem = null;
+            } else {
+              console.error('Failed to update wishlist item');
             }
-          });
-      }
+          },
+          error: (error) => {
+            console.error('Error updating wishlist item:', error);
+          }
+        });
     }
   }
 
   deleteItem(itemId: number) {
     if (this.wishlistData && confirm('Are you sure you want to delete this item?')) {
-      this.wishlistData.items = this.wishlistData.items.filter(item => item.id !== itemId);
-      this.wishlistData.lastUpdated = new Date().toLocaleDateString('en-GB');
-      
-      // Update via GitHub API for real-time sync
-      this.githubService.updateWishlist('ioana', this.wishlistData)
+      this.firebaseService.removeWishlistItem('ioana', itemId)
         .subscribe({
-          next: () => {
-            console.log('Wishlist updated on GitHub');
+          next: (success) => {
+            if (success) {
+              console.log('Wishlist item deleted from Firebase');
+            } else {
+              console.error('Failed to delete wishlist item');
+            }
           },
           error: (error) => {
-            console.error('Error updating wishlist:', error);
-            // Fallback to localStorage
-            this.saveToLocalStorage();
+            console.error('Error deleting wishlist item:', error);
           }
         });
     }
@@ -125,47 +111,44 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
     this.newItem = {
       name: '',
       link: '',
-      priority: 'medium'
+      priority: 'medium',
+      hasLink: false
     };
+  }
+
+  onLinkCheckboxChange() {
+    if (!this.newItem.hasLink) {
+      this.newItem.link = '';
+    }
   }
 
   addNewItem() {
     if (this.wishlistData && this.newItem.name) {
-      const newId = Math.max(...this.wishlistData.items.map(item => item.id)) + 1;
       const item: WishlistItem = {
-        id: newId,
+        id: Date.now(), // Firebase service will handle ID generation
         name: this.newItem.name!,
-        link: this.newItem.link || '#',
+        link: this.newItem.hasLink && this.newItem.link ? this.newItem.link : '',
         priority: this.newItem.priority as 'high' | 'medium' | 'low'
       };
       
-      this.wishlistData.items.push(item);
-      this.wishlistData.lastUpdated = new Date().toLocaleDateString('en-GB');
-      
-      // Update via GitHub API for real-time sync
-      this.githubService.updateWishlist('ioana', this.wishlistData)
+      this.firebaseService.addWishlistItem('ioana', item)
         .subscribe({
-          next: () => {
-            console.log('Wishlist updated on GitHub');
-            this.showAddForm = false;
-            this.resetNewItem();
+          next: (success) => {
+            if (success) {
+              console.log('Wishlist item added to Firebase');
+              this.showAddForm = false;
+              this.resetNewItem();
+            } else {
+              console.error('Failed to add wishlist item');
+            }
           },
           error: (error) => {
-            console.error('Error updating wishlist:', error);
-            // Fallback to localStorage
-            this.saveToLocalStorage();
-            this.showAddForm = false;
-            this.resetNewItem();
+            console.error('Error adding wishlist item:', error);
           }
         });
     }
   }
 
-  saveToLocalStorage() {
-    if (this.wishlistData) {
-      localStorage.setItem('ioana-wishlist', JSON.stringify(this.wishlistData));
-    }
-  }
 
   goBack() {
     this.router.navigate(['/']);
@@ -174,6 +157,23 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
   goToSettings() {
     this.router.navigate(['/settings']);
   }
+
+  loadWishlistData() {
+    this.loading = true;
+    this.firebaseService.loadWishlist('ioana').subscribe({
+      next: (data) => {
+        if (data) {
+          this.wishlistData = data;
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading wishlist:', error);
+        this.loading = false;
+      }
+    });
+  }
+
 
   getPriorityClass(priority: string): string {
     return `priority-${priority}`;

@@ -1,18 +1,17 @@
 # Wishlist App
 
-A beautiful, responsive wishlist application built with Angular that allows users to create and manage their personal wishlists with **full editing capabilities and real-time synchronization**.
+A beautiful, responsive wishlist application built with Angular that allows users to create and manage their personal wishlists with **full editing capabilities and real-time synchronization using Firebase**.
 
 ## Features
 
 - **User Selection**: Choose between different users (Ioana and Iulian)
-- **Dynamic Wishlists**: Wishlist data is loaded from JSON files for easy updates
+- **🆕 Firebase Integration**: Real-time database with Firestore
 - **🆕 In-Browser Editing**: Users can edit their wishlists directly on the website
 - **🆕 Add/Edit/Delete Items**: Full CRUD operations with beautiful forms
-- **🆕 Real-Time Sync**: See each other's changes instantly via GitHub API
-- **🆕 Local Storage**: Changes are automatically saved in the browser
-- **🆕 GitHub Integration**: Free real-time updates using GitHub's API
+- **🆕 Real-Time Sync**: See each other's changes instantly via Firebase
+- **🆕 Link Management**: Optional links with checkbox control
+- **🆕 Priority System**: Items are color-coded by priority (high, medium, low)
 - **Responsive Design**: Works perfectly on desktop and mobile devices
-- **Priority System**: Items are color-coded by priority (high, medium, low)
 - **GitHub Pages Ready**: Automatically deploys to GitHub Pages
 
 ## Live Demo
@@ -22,96 +21,26 @@ Visit the live application at: `https://yourusername.github.io/wishlist/`
 ## 🚀 Real-Time Features
 
 ### **How Real-Time Sync Works**
-1. **GitHub as Database**: Uses GitHub repository files as shared storage
-2. **API Updates**: Users can update each other's JSON files via GitHub API
-3. **Automatic Polling**: App checks for updates every 30 seconds
-4. **Instant Sync**: Changes appear for all users without refresh
+1. **Firebase Firestore**: Uses Firebase as the backend database
+2. **Real-Time Listeners**: Changes appear instantly across all devices
+3. **Automatic Sync**: No manual refresh needed
+4. **Offline Support**: Works offline and syncs when connection is restored
 5. **🆕 Zero Configuration**: Works automatically without any setup!
 
-### **Setup for Real-Time Updates**
-1. **Generate GitHub Token**: Create a Personal Access Token with 'repo' scope
-2. **Update Configuration**: Add your token to `src/app/config/github.config.ts`
-3. **Deploy**: Push to GitHub and real-time updates work automatically!
-
 ### **Benefits**
-- ✅ **Free**: Uses GitHub's free API (no backend costs)
 - ✅ **Real-Time**: See changes from other users instantly
-- ✅ **Zero Setup**: Users don't need to configure anything
-- ✅ **Secure**: Uses GitHub's secure authentication
-- ✅ **Reliable**: GitHub's infrastructure ensures uptime
-- ✅ **Version Control**: All changes are tracked in Git history
-
-## How Users Can Edit Their Wishlists
-
-### ✨ **Direct Browser Editing (NEW!)**
-Users can now edit their wishlists directly on the website:
-
-1. **Add New Items**: Click the "+ Add New Item" button
-2. **Edit Existing Items**: Click the ✏️ edit button on any item
-3. **Delete Items**: Click the 🗑️ delete button (with confirmation)
-4. **Automatic Saving**: All changes are saved automatically in the browser
-
-### **Features Available:**
-- ✅ Add new wishlist items with full details
-- ✅ Edit existing items (name, description, price, category, priority, link)
-- ✅ Delete items with confirmation dialog
-- ✅ Priority levels (High/Medium/Low) with color coding
-- ✅ Categories for better organization
-- ✅ External links to products
-- ✅ Automatic timestamp updates
-- ✅ Data persistence across browser sessions
-
-## How to Update Wishlists (For Administrators)
-
-### For Ioana's Wishlist:
-1. Navigate to `src/assets/ioana-wishlist.json`
-2. Edit the JSON file with new items
-3. Update the `lastUpdated` field with the current date
-4. Commit and push changes to trigger automatic deployment
-
-### For Iulian's Wishlist:
-1. Navigate to `src/assets/iulian-wishlist.json`
-2. Edit the JSON file with new items
-3. Update the `lastUpdated` field with the current date
-4. Commit and push changes to trigger automatic deployment
-
-### JSON Structure
-
-```json
-{
-  "user": "User Name",
-  "lastUpdated": "YYYY-MM-DD",
-  "items": [
-    {
-      "id": 1,
-      "name": "Item Name",
-      "description": "Item description",
-      "link": "https://example.com/item",
-      "price": "$99.99",
-      "priority": "high|medium|low",
-      "category": "Category Name"
-    }
-  ]
-}
-```
-
-### Priority Colors
-- **High Priority**: Red border
-- **Medium Priority**: Orange border  
-- **Low Priority**: Green border
+- ✅ **Reliable**: Firebase's infrastructure ensures uptime
+- ✅ **Scalable**: Handles multiple users seamlessly
+- ✅ **Secure**: Firebase handles authentication and security
+- ✅ **Offline**: Works even without internet connection
 
 ## Setup Instructions
 
-### **1. Configure GitHub Repository**
-1. Update `src/app/config/github.config.ts`:
-   ```typescript
-   export const GITHUB_CONFIG = {
-     REPO_OWNER: 'yourusername', // ⚠️ CHANGE THIS to your GitHub username
-     REPO_NAME: 'wishlist',
-     BRANCH: 'main',
-     API_BASE: 'https://api.github.com/repos'
-   };
-   ```
+### **1. Firebase Setup**
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable Firestore Database
+3. Update `src/app/config/firebase.config.ts` with your Firebase config
+4. Set up Firestore security rules (test mode for development)
 
 ### **2. Deploy to GitHub Pages**
 1. Create a public repository named `wishlist`
@@ -119,38 +48,19 @@ Users can now edit their wishlists directly on the website:
 3. Enable GitHub Pages in repository settings
 4. Your app will be live at `https://yourusername.github.io/wishlist/`
 
-### **3. Get GitHub Personal Access Token**
-1. Go to GitHub.com → Settings → Developer settings → Personal access tokens
-2. Click "Generate new token (classic)"
-3. Give it a name like "Wishlist App"
-4. Select scope: **"repo"** (full control of private repositories)
-5. Click "Generate token"
-6. Copy the token
-
-### **4. Configure Real-Time Updates**
-1. Open `src/app/config/github.config.ts`
-2. Replace `'ghp_your_default_token_here'` with your actual token
-3. Save the file
-4. Deploy to GitHub - real-time updates work automatically!
-
 ## Data Storage
 
-### **Real-Time Sync (GitHub API)**
-- Changes are saved to GitHub repository files via API
-- All users see updates in real-time (every 30 seconds)
-- Uses default token for automatic authentication
-- Free and reliable using GitHub's infrastructure
+### **Firebase Firestore (Primary)**
+- Real-time database with automatic synchronization
+- Changes appear instantly across all devices
+- Handles offline scenarios gracefully
+- Secure and scalable
 
-### **Local Storage (Client-Side Backup)**
+### **Local Storage (Backup)**
 - User edits are automatically saved in the browser's localStorage
 - Data persists across browser sessions
-- Each user has their own separate storage (`ioana-wishlist`, `iulian-wishlist`)
-- Used as fallback when GitHub API is unavailable
-
-### **JSON Files (Default Data)**
-- Initial/default data loaded from JSON files
-- Perfect for first-time visitors
-- Can be updated by administrators via Git
+- Each user has their own separate storage
+- Used as fallback when Firebase is unavailable
 
 ## Local Development
 
@@ -176,13 +86,15 @@ src/
 ├── app/
 │   ├── models/
 │   │   └── wishlist.model.ts    # TypeScript interfaces
+│   ├── config/
+│   │   └── firebase.config.ts   # Firebase configuration
+│   ├── services/
+│   │   ├── firebase-wishlist.service.ts      # Firebase service
+│   │   └── firebase-initialization.service.ts # Initialization service
 │   ├── user-selection/          # User selection component
 │   ├── ioana-wishlist/          # Ioana's wishlist component (with editing)
 │   ├── iulian-wishlist/         # Iulian's wishlist component (with editing)
 │   └── app.routes.ts            # Application routing
-├── assets/
-│   ├── ioana-wishlist.json      # Ioana's default wishlist data
-│   └── iulian-wishlist.json     # Iulian's default wishlist data
 └── main.ts                      # Application bootstrap
 ```
 
@@ -192,7 +104,8 @@ src/
 - TypeScript
 - SCSS
 - Angular Forms (Template-driven forms)
-- LocalStorage API
+- Firebase Firestore
+- Firebase Analytics
 - GitHub Actions
 - GitHub Pages
 

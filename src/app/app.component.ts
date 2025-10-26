@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { FirebaseInitializationService } from './services/firebase-initialization.service';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,15 @@ import { RouterOutlet } from '@angular/router';
   `,
   styles: []
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'wishlist-app';
+
+  constructor(private firebaseInitService: FirebaseInitializationService) {}
+
+  ngOnInit() {
+    // Delay initialization to allow Firebase listeners to set up first
+    setTimeout(() => {
+      this.firebaseInitService.initializeFirebaseData();
+    }, 2000); // 2 second delay
+  }
 }
