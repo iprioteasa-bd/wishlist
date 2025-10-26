@@ -1,0 +1,41 @@
+<div class="user-selection-container">
+  <div class="container">
+    <div class="welcome-section fade-in-up">
+      <h1 class="main-title">Welcome to Your Wishlist</h1>
+      <p class="subtitle">Choose your profile to get started</p>
+    </div>
+
+    <div class="user-cards">
+      <div class="user-card fade-in-up" (click)="selectUser('Ioana')">
+        <div class="card-content">
+          <div class="user-avatar ioana-avatar">
+            <span class="avatar-text">I</span>
+          </div>
+          <h3 class="user-name">Ioana</h3>
+          <p class="user-description">Your personal wishlist</p>
+          <div class="card-footer">
+            <span class="select-text">Click to select</span>
+            <div class="arrow-icon">→</div>
+          </div>
+        </div>
+        <div class="card-background"></div>
+      </div>
+
+      <div class="user-card fade-in-up" (click)="selectUser('Iulian')">
+        <div class="card-content">
+          <div class="user-avatar iulian-avatar">
+            <span class="avatar-text">I</span>
+          </div>
+          <h3 class="user-name">Iulian</h3>
+          <p class="user-description">Your personal wishlist</p>
+          <div class="card-footer">
+            <span class="select-text">Click to select</span>
+            <div class="arrow-icon">→</div>
+          </div>
+        </div>
+        <div class="card-background"></div>
+      </div>
+    </div>
+
+  </div>
+</div>

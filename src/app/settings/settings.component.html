@@ -1,0 +1,92 @@
+<div class="settings-container">
+  <div class="container">
+    <div class="header-section">
+      <button class="back-button" (click)="goBack()">← Back</button>
+      <h1 class="settings-title">Settings</h1>
+      <p class="settings-subtitle">Configure real-time wishlist updates</p>
+    </div>
+
+    <div class="settings-content">
+      <div class="auth-section">
+        <div class="auth-status" [ngClass]="{'authenticated': isAuthenticated}">
+          <div class="status-indicator">
+            <span class="status-icon">{{ isAuthenticated ? '✅' : '❌' }}</span>
+            <span class="status-text">
+              {{ isAuthenticated ? 'Connected to GitHub' : 'Not connected to GitHub' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="token-section">
+          <h3>GitHub Personal Access Token</h3>
+          <p class="token-description">
+            To enable real-time updates between users, you need a GitHub token.
+          </p>
+          
+          <div class="token-input-group">
+            <input 
+              type="password" 
+              [(ngModel)]="githubToken" 
+              placeholder="Enter your GitHub token..."
+              class="token-input"
+            >
+            <button (click)="saveToken()" class="save-button" [disabled]="!githubToken.trim()">
+              Save Token
+            </button>
+          </div>
+
+          <div class="token-actions">
+            <button (click)="toggleInstructions()" class="help-button">
+              {{ showInstructions ? 'Hide' : 'Show' }} Instructions
+            </button>
+            <button (click)="clearToken()" class="clear-button" *ngIf="isAuthenticated">
+              Remove Token
+            </button>
+          </div>
+
+          <div *ngIf="showInstructions" class="instructions">
+            <h4>How to get a GitHub Personal Access Token:</h4>
+            <ol>
+              <li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Personal Access Tokens</a></li>
+              <li>Click "Generate new token (classic)"</li>
+              <li>Give it a name like "Wishlist App"</li>
+              <li>Select scope: <strong>"repo"</strong> (full control of private repositories)</li>
+              <li>Click "Generate token"</li>
+              <li>Copy the token and paste it above</li>
+            </ol>
+            <div class="warning">
+              ⚠️ <strong>Important:</strong> Keep your token private and don't share it with anyone!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-section">
+        <h3>Real-Time Features</h3>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-icon">🔄</span>
+            <div class="feature-content">
+              <h4>Live Updates</h4>
+              <p>See changes from other users in real-time (updates every 30 seconds)</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">💾</span>
+            <div class="feature-content">
+              <h4>Cloud Sync</h4>
+              <p>Your changes are saved to GitHub and visible to everyone</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔒</span>
+            <div class="feature-content">
+              <h4>Secure</h4>
+              <p>Uses GitHub's secure API with your personal access token</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

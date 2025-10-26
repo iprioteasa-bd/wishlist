@@ -1,0 +1,36 @@
+{
+  "user": "Iulian",
+  "lastUpdated": "15.01.2024",
+  "items": [
+    {
+      "id": 1,
+      "name": "Gaming Monitor",
+      "link": "https://example.com/gaming-monitor",
+      "priority": "high"
+    },
+    {
+      "id": 2,
+      "name": "Mechanical Keyboard",
+      "link": "https://example.com/keyboard",
+      "priority": "high"
+    },
+    {
+      "id": 3,
+      "name": "Gaming Chair",
+      "link": "https://example.com/gaming-chair",
+      "priority": "medium"
+    },
+    {
+      "id": 4,
+      "name": "Protein Powder",
+      "link": "https://example.com/protein",
+      "priority": "low"
+    },
+    {
+      "id": 5,
+      "name": "Smart Watch",
+      "link": "https://example.com/smartwatch",
+      "priority": "medium"
+    }
+  ]
+}

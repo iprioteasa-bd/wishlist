@@ -1,0 +1,98 @@
+<div class="wishlist-container">
+  <div class="container">
+    <div class="header-section">
+      <button class="back-button" (click)="goBack()">← Back</button>
+      <h1 class="wishlist-title">{{ userName }}'s Wishlist</h1>
+      <div *ngIf="wishlistData" class="last-updated">
+        Last updated: {{ formatDate(wishlistData.lastUpdated) }}
+      </div>
+      <div class="header-actions">
+        <button class="add-button" (click)="showAddItemForm()" *ngIf="!showAddForm && !editingItem">
+          + Add New Item
+        </button>
+      </div>
+    </div>
+
+    <div class="wishlist-content">
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading wishlist...</p>
+      </div>
+
+      <div *ngIf="error" class="error">
+        <p>{{ error }}</p>
+        <button (click)="loadWishlistData()" class="retry-button">Retry</button>
+      </div>
+
+      <!-- Add New Item Form -->
+      <div *ngIf="showAddForm" class="edit-form">
+        <h3>Add New Item</h3>
+        <form (ngSubmit)="addNewItem()">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" [(ngModel)]="newItem.name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>Link</label>
+            <input type="url" [(ngModel)]="newItem.link" name="link" placeholder="https://example.com">
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select [(ngModel)]="newItem.priority" name="priority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="save-button">Add Item</button>
+            <button type="button" (click)="cancelEdit()" class="cancel-button">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Edit Item Form -->
+      <div *ngIf="editingItem" class="edit-form">
+        <h3>Edit Item</h3>
+        <form (ngSubmit)="saveEdit()">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" [(ngModel)]="editingItem.name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>Link</label>
+            <input type="url" [(ngModel)]="editingItem.link" name="link">
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select [(ngModel)]="editingItem.priority" name="priority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="save-button">Save Changes</button>
+            <button type="button" (click)="cancelEdit()" class="cancel-button">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Wishlist Items -->
+      <div *ngIf="wishlistData && !loading && !showAddForm && !editingItem" class="wishlist-items">
+        <div *ngFor="let item of getSortedItems()" class="wishlist-item" [ngClass]="getPriorityClass(item.priority)">
+          <div class="item-header">
+            <h3>{{ item.name }}</h3>
+            <div class="item-actions">
+              <button class="edit-button" (click)="startEdit(item)">✏️</button>
+              <button class="delete-button" (click)="deleteItem(item.id)">🗑️</button>
+            </div>
+          </div>
+          <div class="item-footer">
+            <a [href]="item.link" target="_blank" class="item-link">View Item</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
