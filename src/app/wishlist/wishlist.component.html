@@ -1,7 +1,6 @@
 <div class="wishlist-container">
   <div class="container">
     <div class="header-section">
-      <button class="back-button" (click)="goBack()">← Back</button>
       <h1 class="wishlist-title">{{ userName }}'s Wishlist</h1>
       <div *ngIf="wishlistData" class="last-updated">
         Last updated: {{ formatDate(wishlistData.lastUpdated) }}
@@ -102,3 +101,4 @@
     </div>
   </div>
 </div>
+

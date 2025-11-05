@@ -1,13 +1,7 @@
 import { Routes } from '@angular/router';
-import { UserSelectionComponent } from './user-selection/user-selection.component';
-import { IoanaWishlistComponent } from './ioana-wishlist/ioana-wishlist.component';
-import { IulianWishlistComponent } from './iulian-wishlist/iulian-wishlist.component';
-import { SettingsComponent } from './settings/settings.component';
 
+// Single page application - no routing needed
+// All components are managed by AppComponent
 export const routes: Routes = [
-  { path: '', component: UserSelectionComponent },
-  { path: 'ioana', component: IoanaWishlistComponent },
-  { path: 'iulian', component: IulianWishlistComponent },
-  { path: 'settings', component: SettingsComponent },
-  { path: '**', redirectTo: '' }
+  { path: '', redirectTo: '', pathMatch: 'full' }
 ];

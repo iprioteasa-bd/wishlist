@@ -32,6 +32,11 @@ export class FirebaseWishlistService {
   public ioanaWishlist$ = this.ioanaWishlistSubject.asObservable();
   public iulianWishlist$ = this.iulianWishlistSubject.asObservable();
 
+  // Generic method to get wishlist observable by user
+  getWishlistByUser(user: 'ioana' | 'iulian'): Observable<WishlistData | null> {
+    return user === 'ioana' ? this.ioanaWishlist$ : this.iulianWishlist$;
+  }
+
   constructor() {
     this.setupRealtimeListeners();
   }

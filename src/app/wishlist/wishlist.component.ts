@@ -1,26 +1,28 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { WishlistData, WishlistItem } from '../models/wishlist.model';
 import { FirebaseWishlistService } from '../services/firebase-wishlist.service';
 
 @Component({
-  selector: 'app-ioana-wishlist',
+  selector: 'app-wishlist',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './ioana-wishlist.component.html',
-  styleUrls: ['./ioana-wishlist.component.scss']
+  templateUrl: './wishlist.component.html',
+  styleUrls: ['./wishlist.component.scss']
 })
-export class IoanaWishlistComponent implements OnInit, OnDestroy {
-  userName = 'Ioana';
+export class WishlistComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() user: 'ioana' | 'iulian' | null = null;
+  
+  userName: string = '';
+  userKey: 'ioana' | 'iulian' = 'ioana';
   wishlistData: WishlistData | null = null;
   loading = true;
   error: string | null = null;
   editingItem: WishlistItem | null = null;
   showAddForm = false;
-  private subscription = new Subscription();
+  private firebaseSubscription?: Subscription;
   
   newItem: Partial<WishlistItem> = {
     name: '',
@@ -30,27 +32,48 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
   };
   
   constructor(
-    private router: Router, 
     private firebaseService: FirebaseWishlistService
   ) {}
 
   ngOnInit() {
+    if (this.user) {
+      this.loadUserWishlist(this.user);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['user'] && this.user) {
+      this.loadUserWishlist(this.user);
+    }
+  }
+
+  private loadUserWishlist(user: 'ioana' | 'iulian') {
+    this.userKey = user;
+    this.userName = user === 'ioana' ? 'Ioana' : 'Iulian';
+    
+    // Reset loading when switching users
+    this.loading = true;
+    
+    // Unsubscribe from previous Firebase subscription if it exists
+    if (this.firebaseSubscription) {
+      this.firebaseSubscription.unsubscribe();
+    }
+    
     // Subscribe to real-time updates from Firebase
-    this.subscription.add(
-      this.firebaseService.ioanaWishlist$.subscribe(data => {
-        console.log('Ioana component received data:', data);
-        if (data) {
-          this.wishlistData = data;
-          this.loading = false;
-        }
-      })
-    );
+    this.firebaseSubscription = this.firebaseService.getWishlistByUser(this.userKey).subscribe((data: WishlistData | null) => {
+      console.log(`${this.userName} component received data:`, data);
+      if (data) {
+        this.wishlistData = data;
+        this.loading = false;
+      }
+    });
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if (this.firebaseSubscription) {
+      this.firebaseSubscription.unsubscribe();
+    }
   }
-
 
   startEdit(item: WishlistItem) {
     this.editingItem = { ...item };
@@ -66,7 +89,7 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
   saveEdit() {
     if (this.editingItem && this.wishlistData) {
       // Update the item using Firebase service
-      this.firebaseService.updateWishlistItem('ioana', this.editingItem.id, this.editingItem)
+      this.firebaseService.updateWishlistItem(this.userKey, this.editingItem.id, this.editingItem)
         .subscribe({
           next: (success) => {
             if (success) {
@@ -85,7 +108,7 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
 
   deleteItem(itemId: number) {
     if (this.wishlistData && confirm('Are you sure you want to delete this item?')) {
-      this.firebaseService.removeWishlistItem('ioana', itemId)
+      this.firebaseService.removeWishlistItem(this.userKey, itemId)
         .subscribe({
           next: (success) => {
             if (success) {
@@ -131,7 +154,7 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
         priority: this.newItem.priority as 'high' | 'medium' | 'low'
       };
       
-      this.firebaseService.addWishlistItem('ioana', item)
+      this.firebaseService.addWishlistItem(this.userKey, item)
         .subscribe({
           next: (success) => {
             if (success) {
@@ -149,18 +172,13 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
     }
   }
 
-
   goBack() {
-    this.router.navigate(['/']);
-  }
-
-  goToSettings() {
-    this.router.navigate(['/settings']);
+    // This will be handled by parent component
   }
 
   loadWishlistData() {
     this.loading = true;
-    this.firebaseService.loadWishlist('ioana').subscribe({
+    this.firebaseService.loadWishlist(this.userKey).subscribe({
       next: (data) => {
         if (data) {
           this.wishlistData = data;
@@ -173,7 +191,6 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
       }
     });
   }
-
 
   getPriorityClass(priority: string): string {
     return `priority-${priority}`;
@@ -205,3 +222,4 @@ export class IoanaWishlistComponent implements OnInit, OnDestroy {
     return `${day}.${month}.${year}`;
   }
 }
+

@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,14 +9,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./user-selection.component.scss']
 })
 export class UserSelectionComponent {
-  constructor(private router: Router) {}
+  @Output() userSelected = new EventEmitter<'ioana' | 'iulian'>();
 
   selectUser(user: string) {
     // Store selected user in localStorage for persistence
     localStorage.setItem('selectedUser', user);
     
-    // Navigate to the specific user's wishlist page
-    const route = user.toLowerCase();
-    this.router.navigate([`/${route}`]);
+    // Emit the selected user to parent component
+    const userKey = user.toLowerCase() as 'ioana' | 'iulian';
+    this.userSelected.emit(userKey);
   }
 }
